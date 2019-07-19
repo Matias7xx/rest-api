@@ -1,7 +1,8 @@
 import {Server} from './server/server' //Importando o servidor criado
+import {usersRouter} from './users/users.router'
 
 const server = new Server()
-server.bootstrap().then(server => { //Conectado com sucesso
+server.bootstrap([usersRouter]).then(server => { //Conectado com sucesso
   console.log('Server is listening on: ', server.application.address())
 }).catch(err => {
   console.log('Server failed to start')
