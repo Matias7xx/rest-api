@@ -1,10 +1,23 @@
 import * as restify from 'restify'
+import * as mongoose from 'mongoose'
 import {environment} from '../common/environment'
 import {Router} from '../common/router'
 
 export class Server {
 
     application: restify.Server //Inicializar o server com restify
+
+    initializeDb() { //Promise que inicializa o Banco
+        (<any>mongoose).Promise = global.Promise //Tentar remover
+        return mongoose.connect(environment.db.url, {
+            useNewUrlParser: true //NOVO JEITO DE CONEXÃO
+            //useMongoClient: true //JEITO ANTIGO (DEPRECATED)
+        }).catch(e => {
+            const msg = 'ERRO! Não foi possível conectar com o MongoDB!'
+            console.log('\x1b[41m%s\x1b[37m', msg, '\x1b[0m') //Caracteres especiais de warning vermelho
+        })
+    }
+
     //Os métodos InitRoutes e Bootstrap estão retornando uma Promise
     initRoutes(routers: Router[]): Promise<any> {
         return new Promise((resolve, reject) => {
@@ -32,6 +45,7 @@ export class Server {
     }
     //Para o médoto bootstrap é passado um array de rotas
     bootstrap(routers: Router[] = []): Promise<Server> { //Método que retorna a classe Server configurada
-        return this.initRoutes(routers).then(() => this)
+        return this.initializeDb().then(() => //Inicializando o BANCO
+            this.initRoutes(routers).then(() => this)) //Inicializando as Rotas
     }
 }
