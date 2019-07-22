@@ -8,9 +8,10 @@ export class Server {
     application: restify.Server //Inicializar o server com restify
 
     initializeDb() { //Promise que inicializa o Banco
-        (<any>mongoose).Promise = global.Promise //Tentar remover
-        return mongoose.connect(environment.db.url, {
-            useNewUrlParser: true //NOVO JEITO DE CONEXÃO
+        (<any>mongoose).Promise = global.Promise //Remover se não for usar TypeScript
+        mongoose.set('useCreateIndex', true) //Necessário
+        return  mongoose.connect(environment.db.url, {
+            useNewUrlParser: true, //NOVO JEITO DE CONEXÃO
             //useMongoClient: true //JEITO ANTIGO (DEPRECATED)
         }).catch(e => {
             const msg = 'ERRO! Não foi possível conectar com o MongoDB!'
@@ -28,7 +29,8 @@ export class Server {
                 })
                 //Restify não fornece por padrão os valores dos parametros de URL.
                 //É necessário configurar o server, SE NECESSÁRIO
-                this.application.use(restify.plugins.queryParser())
+                this.application.use(restify.plugins.queryParser()) //Parser dos parametros da URL
+                this.application.use(restify.plugins.bodyParser()) //Parser do corpo da req para JSON
 
                 //Routes
                 for (let router of routers) { //Iterando sobre todas as rotas do array

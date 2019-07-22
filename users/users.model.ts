@@ -1,21 +1,24 @@
-const users = [
-    { id: '1', name: 'Gabriel Nóbrega', email: 'matiasnobrega7@' },
-    { id: '2', name: 'Camila', email: 'camilanobrega7@' }
-]
+import * as mongoose from 'mongoose'
+//mongoose.set('useCreateIndex', true) //Foi inserido diretamente na conexão
 
-export class User { //Emula um GET
-    static findAll(): Promise<any[]> { //Pegando todos os usuários
-        return Promise.resolve(users)
-    }
-
-    static findById(id: string): Promise<any> { //Emula um Get by ID
-        return new Promise(resolve=> {
-            const filtered = users.filter(user => user.id === id)
-            let user = undefined
-            if(filtered.length > 0) {
-                user = filtered[0]
-            }
-            resolve(user)
-        })
-    }
+export interface User extends mongoose.Document { //Interface para gerar auto complete no router
+    name: string,
+    email: string,
+    password: string
 }
+
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String
+    },
+    email: {
+        type: String,
+        unique: true
+    },
+    password: {
+        type: String,
+        select: false //Não vai trazer o campo de senha por padrão
+    }
+})
+//Foi passado a interface User dentro do Generics <>
+export const User = mongoose.model<User>('User', userSchema) //Collection de Usuários
