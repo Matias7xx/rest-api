@@ -59,7 +59,18 @@ class UsersRouter extends Router {
                     res.send(404)
                     return next()
                 })
+        })
 
+        application.del('/users/:id', (req, res, next) => { //REMOVER
+            User.deleteOne({_id: req.params.id}).exec().then((cmdResult: any) => {
+                if(cmdResult.n) {
+                    res.json({message: 'Usuário removido com sucesso!'})
+                    res.send(204)
+                } else {
+                    res.send(404)
+                }
+                return next()
+            })
         })
     }
 }
