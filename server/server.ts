@@ -1,7 +1,9 @@
 import * as restify from 'restify'
 import * as mongoose from 'mongoose'
+
 import {environment} from '../common/environment'
 import {Router} from '../common/router'
+import {mergePatchBodyParser} from './merge-patch.parser'
 
 export class Server {
 
@@ -12,6 +14,7 @@ export class Server {
         mongoose.set('useCreateIndex', true) //Necessário
         return  mongoose.connect(environment.db.url, {
             useNewUrlParser: true, //NOVO JEITO DE CONEXÃO
+            useFindAndModify: false //NECESSÁRIO! forma antiga deprecated
             //useMongoClient: true //JEITO ANTIGO (DEPRECATED)
         }).catch(e => {
             const msg = 'ERRO! Não foi possível conectar com o MongoDB!'
@@ -31,6 +34,7 @@ export class Server {
                 //É necessário configurar o server, SE NECESSÁRIO
                 this.application.use(restify.plugins.queryParser()) //Parser dos parametros da URL
                 this.application.use(restify.plugins.bodyParser()) //Parser do corpo da req para JSON
+                this.application.use(mergePatchBodyParser)
 
                 //Routes
                 for (let router of routers) { //Iterando sobre todas as rotas do array

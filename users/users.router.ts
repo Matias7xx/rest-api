@@ -47,6 +47,20 @@ class UsersRouter extends Router {
                     return next()
                 })
         })
+
+        application.patch('/users/:id', (req, res, next) => { //Atualização parcial do documento
+            const options = {new : true} //Receber o documento atualizado
+            User.findByIdAndUpdate(req.params.id, req.body, options)
+                .then(user => {
+                    if(user) {
+                        res.json(user)
+                        return next()
+                    }
+                    res.send(404)
+                    return next()
+                })
+
+        })
     }
 }
 //Associar o Router ao método Bootstrap do Server
