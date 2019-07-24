@@ -1,5 +1,7 @@
 import * as mongoose from 'mongoose'
 import {validateCPF} from '../common/validators'
+import * as bcrypt from 'bcrypt'
+import {environment} from '../common/environment'
 //mongoose.set('useCreateIndex', true) //Foi inserido diretamente na conexão
 
 export interface User extends mongoose.Document { //Interface para gerar auto complete no router
@@ -42,5 +44,62 @@ const userSchema = new mongoose.Schema({
         ]
     }
 })
+
+const hashPassword = (obj, next) => { //Código para reutilizar as middlewares
+    bcrypt.hash(obj.password, environment.security.saltRounds) //hash(senha, nª de rounds)
+    .then(hash => {
+        obj.password = hash
+        next()
+    }).catch(next)
+}
+
+const saveMiddleware = function(this: User, next){ //Código para reutilizar as middlewares
+    const user: User = this
+    if(!user.isModified('password')){ //Se o password não foi modificado, continua com next
+        next()
+    } else {
+        hashPassword(user, next)
+    }
+}
+
+const updateMiddleware = function(next){ //Código para reutilizar as middlewares
+    if(!this.getUpdate().password){ //Se o password não foi modificado, continua com next
+        next()
+    } else {
+        hashPassword(this.getUpdate(), next)
+    }
+}
+
+userSchema.pre('save', saveMiddleware)
+userSchema.pre('findOneAndUpdate', updateMiddleware) //Método Patch
+userSchema.pre('update', updateMiddleware) //Put
+
+//Criptografar senha com Bcrypt
+/*userSchema.pre('save', function(this: User, next){
+    const user: User = this
+    if(!user.isModified('password')){ //Se o password não foi modificado, continua com next
+        next()
+    } else {
+        bcrypt.hash(user.password, environment.security.saltRounds) //hash(senha, nª de rounds)
+            .then(hash => {
+                user.password = hash
+                next()
+            }).catch(next)
+    }
+})*/
+
+//Middleware que faz o hash(criptografa senha) no momento do update
+/*userSchema.pre('findOneAndUpdate', function(next){
+    if(!this.getUpdate().password){ //Se o password não foi modificado, continua com next
+        next()
+    } else {
+        bcrypt.hash(this.getUpdate().password, environment.security.saltRounds) //hash(senha, nª de rounds)
+            .then(hash => {
+                this.getUpdate().password = hash
+                next()
+            }).catch(next)
+    }
+})*/
+
 //Foi passado a interface User dentro do Generics <>
 export const User = mongoose.model<User>('User', userSchema) //Collection de Usuários

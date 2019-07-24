@@ -52,7 +52,8 @@ class UsersRouter extends Router {
         })
 
         application.put('/users/:id', (req, res, next) => { //Atualizar um documento inteiro
-            const options = { overwrite : true } //Indicar que queremos sobreesrever todo o documento
+            const options = { runValidators: true, overwrite : true } //OVERWRITE Indicar que queremos sobreesrever todo o documento
+            //runValidators - Indica que queremos aplicar validações
             User.update({ _id:req.params.id }, req.body, options) //{O que sera atualizado}, novo documento)
                 .exec().then(result => {
                     if(result.n) {
@@ -70,7 +71,7 @@ class UsersRouter extends Router {
         })
 
         application.patch('/users/:id', (req, res, next) => { //Atualização parcial do documento
-            const options = {new : true} //Receber o documento atualizado
+            const options = {runValidators: true, new : true} //Receber o documento atualizado
             /*User.findByIdAndUpdate(req.params.id, req.body, options)
                 .then(user => {
                     if(user) {
