@@ -1,5 +1,6 @@
 import * as restify from 'restify'
 import { EventEmitter } from 'events'; //Padrão do node com funções de renderizações
+import {NotFoundError} from 'restify-errors'
 
 export abstract class Router extends EventEmitter {//Configuração de rotas
     abstract applyRoutes(application: restify.Server) //applyRoutes recebe uma instância do servidor
@@ -10,7 +11,8 @@ export abstract class Router extends EventEmitter {//Configuração de rotas
                 this.emit('beforeRender', document) //Event emiter
                 response.json(document)
             } else {
-                response.send(404)
+                //response.send(404)
+                throw new NotFoundError('Documento não encontrado!')
             }
             return next()
         }

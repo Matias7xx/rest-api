@@ -3,7 +3,9 @@ import * as mongoose from 'mongoose'
 
 import {environment} from '../common/environment'
 import {Router} from '../common/router'
-import {mergePatchBodyParser} from './merge-patch.parser'
+import {mergePatchBodyParser} from './merge-patch.parser' //BodyParser para utilizar o método PATCH
+import {handleError} from './error.handler' //Tratamento de erros
+
 
 export class Server {
 
@@ -44,6 +46,9 @@ export class Server {
                 this.application.listen(environment.server.port, () => {
                     resolve(this.application) //Informar conexão com sucesso
                 })
+                //Evento para tratamento de erro
+                this.application.on('restifyError', handleError )
+
             } catch (err) {
                 reject(err)
             }
