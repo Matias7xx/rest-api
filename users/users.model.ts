@@ -10,6 +10,11 @@ export interface User extends mongoose.Document { //Interface para gerar auto co
     password: string
 }
 
+//Método personalizado no Model para filtrar usuários por email (UTILIZAR CASO O SISTEMA UTILIZE MUITO ESSE FILTRO)
+export interface UserModel extends mongoose.Model<User> {
+    findByEmail(email: string): Promise<User>
+}
+
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -44,6 +49,10 @@ const userSchema = new mongoose.Schema({
         ]
     }
 })
+//Método personalizado no Model para filtrar usuários por email (UTILIZAR CASO O SISTEMA UTILIZE MUITO ESSE FILTRO)
+userSchema.statics.findByEmail = function(email: string) {
+    return this.findOne({email}) //{email: email}
+}
 
 const hashPassword = (obj, next) => { //Código para reutilizar as middlewares
     bcrypt.hash(obj.password, environment.security.saltRounds) //hash(senha, nª de rounds)
@@ -102,4 +111,4 @@ userSchema.pre('update', updateMiddleware) //Put
 })*/
 
 //Foi passado a interface User dentro do Generics <>
-export const User = mongoose.model<User>('User', userSchema) //Collection de Usuários
+export const User = mongoose.model<User, UserModel>('User', userSchema) //Collection de Usuários

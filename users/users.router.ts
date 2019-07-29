@@ -13,9 +13,26 @@ class UsersRouter extends ModelRouter<User> {
         })
     }
     //Versão do GET que filtra o usuário pelo email
-    findByEmail = (req, res, next) => {
+    /*findByEmail = (req, res, next) => {
         if(req.query.email) {
             User.find({email: req.query.email})
+                .then(this.renderAll(res, next))
+                .catch(next)
+        } else {
+            next()
+        }
+    }*/
+
+    findByEmail = (req, res, next) => {
+        if(req.query.email) {
+            User.findByEmail(req.query.email)
+                .then(user => {
+                    if(user) {
+                        return [user]
+                    } else {
+                        return []
+                    }
+                })
                 .then(this.renderAll(res, next))
                 .catch(next)
         } else {
