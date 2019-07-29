@@ -14,7 +14,7 @@ export abstract class Router extends EventEmitter {//Configuração de rotas
                 //response.send(404)
                 throw new NotFoundError('Documento não encontrado!')
             }
-            return next()
+            return next(false) //false para a requisição não caia em outro handler
         }
     }
 
@@ -28,6 +28,7 @@ export abstract class Router extends EventEmitter {//Configuração de rotas
             } else {
                 response.json([])
             }
+            return next(false) //false para a requisição não caia em outro handler
         }
     }
 }

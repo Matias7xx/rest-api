@@ -12,10 +12,22 @@ class UsersRouter extends ModelRouter<User> {
             //delete document.password //Outra alternativa
         })
     }
+    //Versão do GET que filtra o usuário pelo email
+    findByEmail = (req, res, next) => {
+        if(req.query.email) {
+            User.find({email: req.query.email})
+                .then(this.renderAll(res, next))
+                .catch(next)
+        } else {
+            next()
+        }
+    }
 
     applyRoutes(application: restify.Server) {
         
-        application.get('/users', this.findAll)
+        //application.get({path:'/users', version: '1.0.0'}, this.findAll)
+        //Criando outra versão da api GET para filtrar usuários por email
+        application.get({path:'/users', version: '2.0.0'}, [this.findByEmail, this.findAll])
         application.get('/users/:id', [this.validateId, this.findById])
         application.post('/users', this.save)
         application.put('/users/:id', [this.validateId, this.replace])
