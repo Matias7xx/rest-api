@@ -8,6 +8,11 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
         super()
     }
 
+    //Outra forma de pegar o nome usuario e restaurante na Review
+    protected prepareOne(query: mongoose.DocumentQuery<D,D>): mongoose.DocumentQuery<D,D> {
+        return query
+    }
+
     validateId = (req, res, next) => { //Verifica se o ID existe
         if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
             next(new NotFoundError('Document not found'))
@@ -23,7 +28,7 @@ export abstract class ModelRouter<D extends mongoose.Document> extends Router {
     }
 
     findById = (req, res, next) => { //GETBYID
-        this.model.findById(req.params.id)
+        this.prepareOne(this.model.findById(req.params.id)) //PrepareOne forma de pegar o nome usuario e restaurante na Review
             .then(this.render(res, next))
             .catch(next)
     }
