@@ -59,4 +59,9 @@ export class Server {
         return this.initializeDb().then(() => //Inicializando o BANCO
             this.initRoutes(routers).then(() => this)) //Inicializando as Rotas
     }
+
+    shutdown() {
+        return mongoose.disconnect().then(() => this.application.close())
+    }
+    
 }
