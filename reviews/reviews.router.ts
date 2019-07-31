@@ -23,11 +23,24 @@ class ReviewsRouter extends ModelRouter<Review>{
                     .populate('restaurant', 'name')
     }
 
+    //Hypermidia para o link do restaurante que recebeu o review
+    envelope(document) {
+        let resource = super.envelope(document)
+        const restId = document.restaurant._id ? document.restaurant._id : document.restaurant
+        resource._links.restaurant = `/restaurants/${restId}`
+        return resource
+    }
+
+
     applyRoutes(application: restify.Server) {
         
-        application.get('/reviews', this.findAll)
+        /* application.get('/reviews', this.findAll)
         application.get('/reviews/:id', [this.validateId, this.findById])
-        application.post('/reviews', this.save)
+        application.post('/reviews', this.save)*/
+        //Aplicando links de hypermidia
+        application.get(`${this.basePath}`, this.findAll)
+        application.get(`${this.basePath}/:id`, [this.validateId, this.findById])
+        application.post(`${this.basePath}`, this.save)
     }
 }
 

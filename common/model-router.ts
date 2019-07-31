@@ -4,13 +4,24 @@ import * as mongoose from 'mongoose'
 import {NotFoundError} from 'restify-errors'
 
 export abstract class ModelRouter<D extends mongoose.Document> extends Router {
+    //Caminho dos links hypermidia
+    basePath: string
+
     constructor(protected model: mongoose.Model<D>) {
         super()
+        this.basePath = `/${model.collection.name}`
     }
 
     //Outra forma de pegar o nome usuario e restaurante na Review
     protected prepareOne(query: mongoose.DocumentQuery<D,D>): mongoose.DocumentQuery<D,D> {
         return query
+    }
+
+    //Utilizando o envelope HYPERMIDIA
+    envelope(document: any): any {
+        let resource = Object.assign({_links: {}}, document.toJSON())
+        resource._links.self = `${this.basePath}/${resource._id}`
+        return resource
     }
 
     validateId = (req, res, next) => { //Verifica se o ID existe
