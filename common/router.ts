@@ -10,6 +10,10 @@ export abstract class Router extends EventEmitter {//Configuração de rotas
         return document
     }
 
+    envelopeAll(document: any[], options: any = {}): any { //Método que envelopa todos os DOCS para paginação
+        return document
+    }
+
     render(response: restify.Response, next: restify.Next) { //Função de reuso nos metodos HTTP //Renderiza um documento
         return (document) => {
             if(document) {
@@ -23,16 +27,16 @@ export abstract class Router extends EventEmitter {//Configuração de rotas
         }
     }
 
-    renderAll(response: restify.Response, next: restify.Next) { //Renderiza um array de documentos para o GET
+    renderAll(response: restify.Response, next: restify.Next, options: any = {}) { //Renderiza um array de documentos para o GET
         return (documents: any[]) => {
             if(documents) {
                 documents.forEach((document, index, array) => {
                     this.emit('beforeRender', document)
                     array[index] = this.envelope(document)
                 })
-                response.json(documents)
+                response.json(this.envelopeAll(documents, options))
             } else {
-                response.json([])
+                response.json(this.envelopeAll([]))
             }
             return next(false) //false para a requisição não caia em outro handler
         }
