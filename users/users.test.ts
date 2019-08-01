@@ -13,7 +13,7 @@ beforeAll(() => { //Subir servidor diferente do de desenvolvimento para não ter
     address = `http://localhost:${environment.server.port}`
     server = new Server()
     return server.bootstrap([usersRouter])
-        .then(() => User.deleteOne({}).exec())
+        .then(() => User.deleteMany({}).exec())
         .catch(console.error)
 })
 
