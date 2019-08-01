@@ -5,21 +5,7 @@ import {environment} from '../common/environment'
 import {usersRouter} from './users.router'
 import {User} from './users.model'
 
-let address : string //Reuso da url
-let server: Server
-beforeAll(() => { //Subir servidor diferente do de desenvolvimento para não ter conflito de dados
-    environment.db.url = process.env.DB_URL || 'mongodb://localhost/meat-api-test-db'
-    environment.server.port = process.env.SERVER_PORT || 3001
-    address = `http://localhost:${environment.server.port}`
-    server = new Server()
-    return server.bootstrap([usersRouter])
-        .then(() => User.deleteMany({}).exec())
-        .catch(console.error)
-})
-
-afterAll(() => {
-    return server.shutdown()
-})
+let address : string = (<any>global).address //Reuso da url
 
 test('get /users', () => { //Nome do teste, o que o teste vai executar
     return request(address)
