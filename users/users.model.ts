@@ -7,12 +7,15 @@ import {environment} from '../common/environment'
 export interface User extends mongoose.Document { //Interface para gerar auto complete no router
     name: string,
     email: string,
-    password: string
+    password: string,
+    cpf: string,
+    gender: string,
+    matches(password: string): boolean
 }
 
 //Método personalizado no Model para filtrar usuários por email (UTILIZAR CASO O SISTEMA UTILIZE MUITO ESSE FILTRO)
 export interface UserModel extends mongoose.Model<User> {
-    findByEmail(email: string): Promise<User>
+    findByEmail(email: string, projection?: string): Promise<User>
 }
 
 const userSchema = new mongoose.Schema({
@@ -50,8 +53,15 @@ const userSchema = new mongoose.Schema({
     }
 })
 //Método personalizado no Model para filtrar usuários por email (UTILIZAR CASO O SISTEMA UTILIZE MUITO ESSE FILTRO)
-userSchema.statics.findByEmail = function(email: string) {
-    return this.findOne({email}) //{email: email}
+userSchema.statics.findByEmail = function(email: string, projection: string) {
+    return this.findOne({email}, projection) //{email: email}
+}
+
+//Método de instância no Schema para o token JWT
+userSchema.methods.matches = function(password: string): boolean {
+//comparar o password e o hash do BCrypt
+    return bcrypt.compareSync(password, this.password)
+
 }
 
 const hashPassword = (obj, next) => { //Código para reutilizar as middlewares
