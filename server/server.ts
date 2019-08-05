@@ -5,6 +5,7 @@ import {environment} from '../common/environment'
 import {Router} from '../common/router'
 import {mergePatchBodyParser} from './merge-patch.parser' //BodyParser para utilizar o método PATCH
 import {handleError} from './error.handler' //Tratamento de erros
+import {tokenParser} from '../security/token.parser'
 
 
 export class Server {
@@ -37,6 +38,7 @@ export class Server {
                 this.application.use(restify.plugins.queryParser()) //Parser dos parametros da URL
                 this.application.use(restify.plugins.bodyParser()) //Parser do corpo da req para JSON
                 this.application.use(mergePatchBodyParser)
+                this.application.use(tokenParser)
 
                 //Routes
                 for (let router of routers) { //Iterando sobre todas as rotas do array
