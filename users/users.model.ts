@@ -10,7 +10,10 @@ export interface User extends mongoose.Document { //Interface para gerar auto co
     password: string,
     cpf: string,
     gender: string,
-    matches(password: string): boolean
+    profiles: string[],
+    matches(password: string): boolean,
+    hasAny(...profiles: string[]): boolean //Checa se o usuário tem algum perfil
+    //exzemplo: hasAny(['admin', 'user'])
 }
 
 //Método personalizado no Model para filtrar usuários por email (UTILIZAR CASO O SISTEMA UTILIZE MUITO ESSE FILTRO)
@@ -50,6 +53,10 @@ const userSchema = new mongoose.Schema({
             validateCPF,
             '{PATH}: Invalid CPF ({VALUE})'
         ]
+    },
+    profiles: {
+        type: [String],
+        required: false
     }
 })
 //Método personalizado no Model para filtrar usuários por email (UTILIZAR CASO O SISTEMA UTILIZE MUITO ESSE FILTRO)
@@ -61,7 +68,10 @@ userSchema.statics.findByEmail = function(email: string, projection: string) {
 userSchema.methods.matches = function(password: string): boolean {
 //comparar o password e o hash do BCrypt
     return bcrypt.compareSync(password, this.password)
+}
 
+userSchema.methods.hasAny = function(...profiles: string[]) : boolean {
+    return profiles.some(profile => this.profiles.indexOf(profile) !== -1)
 }
 
 const hashPassword = (obj, next) => { //Código para reutilizar as middlewares
