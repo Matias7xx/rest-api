@@ -1,3 +1,5 @@
+import * as fs from 'fs' //Importando fileSystem para usar HTTPS
+
 import * as restify from 'restify'
 import * as mongoose from 'mongoose'
 
@@ -31,7 +33,10 @@ export class Server {
             try {
                 this.application = restify.createServer({
                     name: 'meat-api',
-                    version: '1.0.0'
+                    version: '1.0.0',
+                    //Certificado e Chave do HTTPS
+                    //certificate: fs.readFileSync('./security/keys/cert.pem'),
+                    //key: fs.readFileSync('./security/keys/key.pem')
                 })
                 //Restify não fornece por padrão os valores dos parametros de URL.
                 //É necessário configurar o server, SE NECESSÁRIO
