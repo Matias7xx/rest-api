@@ -1,15 +1,13 @@
 import 'jest'
 import * as request from 'supertest'
-import {Server} from '../server/server'
-import {environment} from '../common/environment'
-import {usersRouter} from './users.router'
-import {User} from './users.model'
 
-let address : string = (<any>global).address //Reuso da url
+const address : string = (<any>global).address //Reuso da url
+const auth : string = (<any>global).auth //Teste após implemento da segurança
 
 test('get /users', () => { //Nome do teste, o que o teste vai executar
     return request(address)
         .get('/users')
+        .set('Authorization', auth)
         .then(response => {
             expect(response.body.items).toBeInstanceOf(Array)
             expect(response.status).toBe(200) //Espero que a requisição seja um sucesso
@@ -19,6 +17,7 @@ test('get /users', () => { //Nome do teste, o que o teste vai executar
 test('post /users', () => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'UsuarioTeste',
             email: 'testepost@email.com',
@@ -38,6 +37,7 @@ test('post /users', () => {
 test('get /users/aaaaa - not found', () => {
     return request(address)
         .get('/users/aaaaa')
+        .set('Authorization', auth)
         .then(response => {
             expect(response.status).toBe(404) //Espero que a requisição seja um sucesso
         }).catch(fail)
@@ -46,6 +46,7 @@ test('get /users/aaaaa - not found', () => {
 test('patch /users/:id',() => {
     return request(address)
         .post('/users')
+        .set('Authorization', auth)
         .send({
             name: 'UsuarioTestePatch',
             email: 'testepatch2@email.com',
@@ -53,6 +54,7 @@ test('patch /users/:id',() => {
         })
         .then(response => request(address)
                             .patch(`/users/${response.body._id}`)
+                            .set('Authorization', auth)
                             .send({
                                 name: 'usuario2 - atualizado'
                             }))

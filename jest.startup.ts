@@ -19,6 +19,14 @@ const beforeAllTests = () => {
         reviewsRouter
         ])
         .then(() => User.deleteMany({}).exec())
+        .then(() => { //Realizar os testes após os incrementos de segurança *Apenas admin pode mexer nos usuarios*
+            let admin = new User()
+            admin.name = 'admin'
+            admin.email = 'admin@email.com'
+            admin.password = '1234567'
+            admin.profiles = ['admin']
+            return admin.save()
+        })
         .then(() => Review.deleteMany({}).exec())
 }
 
